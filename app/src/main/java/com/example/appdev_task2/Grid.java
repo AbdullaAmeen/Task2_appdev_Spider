@@ -10,15 +10,15 @@ import android.util.Log;
 import java.util.Random;
 
 public class Grid extends PaintTools{
-
+    final static int GAME_PLAYING=0, GAME_OVER=-1, GAME_WIN=1;
     int size ,score, noOfBombs;
     RectF gridCords;
     float cellDim, gridDim, gapDim;
     Cell[][] cell;
-    boolean gameOver;
+    int gameState;
     public Grid(int size, float S_Height, float S_Width, int gameDifficulty) {
         this.size = size;
-        gameOver = false;
+        gameState = GAME_PLAYING;
         gapDim = S_Width/48;
         cellDim = (S_Width - (size+1)*gapDim)/size;
         gridDim = S_Width;
@@ -76,13 +76,13 @@ public class Grid extends PaintTools{
             }
     }
 
-    public boolean drawCells(Canvas canvas, Paint paint, Bitmap bomb){
+    public void drawCells(Canvas canvas, Paint paint, Bitmap bomb){
 
         if(canvas != null){
 
             for(int i=0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
-                    if(cell[i][j].value == -1 && gameOver) {
+                    if(cell[i][j].value == -1 && gameState==GAME_OVER) {
                         paint.setColor(Color.RED);
                         canvas.drawRect(cell[i][j].cords, paint);
                         canvas.drawBitmap(bomb,cell[i][j].cords.left, cell[i][j].cords.top, paint);
@@ -92,7 +92,7 @@ public class Grid extends PaintTools{
                         canvas.drawRect(cell[i][j].cords, paint);}
                     else
                         if (cell[i][j].value == -1) {
-                            gameOver = true;
+                            gameState = GAME_OVER;
                             drawCells(canvas, paint, bomb);
                         }
                         else {
@@ -109,7 +109,8 @@ public class Grid extends PaintTools{
 
         }
         Log.v("drawcell", "outside");
-        return gameOver;
+        if(score == size*size-noOfBombs)
+            gameState=GAME_WIN;
     }
 
     public void onTouchGrid(float x , float y){

@@ -55,7 +55,7 @@ public class activity_game_layout extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX(), y = event.getY();
 
-        if(grid.gameOver){
+        if(grid.gameState == grid.GAME_OVER){
             if (bt_restart.cords.contains((int) x, (int) y))
                 restart();
 
@@ -82,8 +82,10 @@ public class activity_game_layout extends View {
             canvas.drawRect(grid.gridCords,paint);
 
             paint.setColor(Color.WHITE);
-            if(grid.drawCells(canvas, paint,bm_bomb))
+            grid.drawCells(canvas, paint,bm_bomb);
+            if(grid.gameState != Grid.GAME_PLAYING)
                 gameOverMenu(canvas);
+
             paintTools.writeText_Center("SCORE: "+ grid.score , getWidth()* 1/4 , getHeight()/16, canvas, Color.WHITE, 64 );
             canvas.drawBitmap(bm_bomb,getWidth()* 3/4 - grid.cellDim/2 , getHeight()/16 - grid.cellDim/2, paint);
             paintTools.writeText_Center(": "+grid.noOfBombs,(int)(getWidth()* 3/4 + grid.cellDim), (int)(getHeight()/16), canvas,Color.WHITE, 64 );
@@ -96,6 +98,9 @@ public class activity_game_layout extends View {
 
 
     public void gameOverMenu(Canvas canvas) {
+        if(grid.gameState == Grid.GAME_WIN){
+            paintTools.writeText_Center("YOU WIN!" , getWidth()/2 , (int)(grid.gridCords.top - 100), canvas, Color.WHITE, 64 );
+        }
         v.vibrate(500);
         Paint paint = new Paint();
         //End Screen
